@@ -1,94 +1,118 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-struct node {
+typedef struct Node{
     int data;
-    struct node *next;
-};
+    struct Node *next;
+} node;
 
-void insertAtHead(struct node **head_ref, int new_data) {
-    struct node *new_node = (struct node *)malloc(sizeof(struct node));
-    new_node->data = new_data;
-    new_node->next = (*head_ref);
-    (*head_ref) = new_node;
-}
+node* head = NULL;
+int count = 0;
 
-void insertAtMiddle(struct node *prev_node, int new_data) {
-    if (prev_node == NULL) {
-        printf("The given previous node cannot be NULL\n");
-        return;
-    }
-    struct node *new_node = (struct node *)malloc(sizeof(struct node));
-    new_node->data = new_data;
-    new_node->next = prev_node->next;
-    prev_node->next = new_node;
-}
+void insert(int data, int position);
+void delete(int position);
+void display();
 
-void insertAtEnd(struct node **head_ref, int new_data) {
-    struct node *new_node = (struct node *)malloc(sizeof(struct node));
-    struct node *last = *head_ref;
-    new_node->data = new_data;
-    new_node->next = NULL;
-    if (*head_ref == NULL) {
-        *head_ref = new_node;
-        return;
-    }
-    while (last->next != NULL) {
-        last = last->next;
-    }
-    last->next = new_node;
-    return;
-}
-
-void display(struct node *node) {
-    printf("Linked List:");
-    while (node != NULL) {
-        printf("%d ", node->data);
-        node = node->next;
-    }
-    printf("\n");
-}
-
-int main() {
-    struct node *head = NULL;
-    int choice=0,a;
-    while(choice!=3){
-        printf("Select an option\n1.Insert\n2.Display\n3.Exit\nChoice:");
-        scanf("%d",&choice);
-
-        switch (choice)
-        {
-        case 1:
-            printf("Enter the value to inserted:");
-            scanf("%d",&a);
-            int choice2;
-            printf("--------------\n1.Insert at Head\n2.Insert at end\n3.Insert in the middle\nChoice:");
-            scanf("%d",&choice2);
-            switch (choice2)
-            {
-            case 1:
-                insertAtHead(&head,a);
-                display(head);
-
-                break;
-            case 2:
-                insertAtMiddle(&head,a);
-                display(head);
-                break;
-            case 3:
-                insertAtEnd(&head,a);
-                display(head);
-                break;
-            }
-            break;
-        case 2:
-            display(head);
-            break;
-        default:
-            break;
+int main(){
+    int data, choice, pos;
+    printf("1. Insert\n2. Delete\n3. Exit\nChoice: ");
+    scanf("%d", &choice);
+    while(choice != 3){
+        if (choice == 1){
+            printf("Enter data and position: ");
+            scanf("%d%d", &data, &pos);
+            insert(data, pos);
+            printf("Count: %d\n", count);
+        } else if (choice == 2){
+            printf("Enter position: ");
+            scanf("%d", &pos);
+            delete(pos);
+            printf("Count: %d\n", count);
         }
+        display();
+        printf("Enter choice: ");
+        scanf("%d", &choice);
     }
+    
 
+    return 0; 
+}
 
-    return 0;
+void insert(int data, int position){
+    if (position == 0){
+        node* new_node = (node*)malloc(sizeof(node));
+        new_node->data = data;
+        new_node->next = NULL;
+        head = new_node;
+        count++;
+        return;
+        
+    } else if (position == count){
+        node* new_node = malloc(sizeof(node));
+        new_node->data = data;
+        new_node->next = NULL;
+        node* temp = head;
+        while(temp->next != NULL)
+            temp = temp->next;
+        temp->next = new_node;
+        count++;
+        return;
+        
+    } else if (position > count || position < 0){
+        printf("Unable to insert at given position\n");
+        return;
+    } else {
+        node* temp = head;
+        for(int i = 0; i < position-1; i++)
+            temp = temp->next;
+        node* new_node = malloc(sizeof(node));
+        new_node->data = data;
+        new_node->next = temp->next;
+        temp->next = new_node;
+        count++;
+        return;
+    }
+}
+
+void delete(int position){
+    if (position == 0){
+        node* temp = head;
+        head = head->next;
+        free(temp);
+        count--;
+        return;
+    } else if (position == count-1){
+        node* temp = head;
+        for(int i = 1; i < count-1; i++)
+            temp = temp->next;
+        node* temp1 = temp->next;
+        temp->next = NULL;
+        free(temp1);
+        count--;
+        return;
+    } else if (position > count || position < 0){
+        printf("Unable to delete at given position\n");
+        return;
+    } else {
+        node* temp = head;
+        for(int i = 0; i < position-1; i++)
+            temp = temp->next;
+        node* temp1 = temp->next;
+        temp->next = temp1->next;
+        free(temp1);
+        count--;
+        return;
+    }
+}
+
+void display(){
+    node* temp = head;
+    printf("Linked List: ");
+    while (temp->next != NULL){
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("%d ", temp->data);
+    printf("\n");
 }
