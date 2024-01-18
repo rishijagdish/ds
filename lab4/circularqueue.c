@@ -1,61 +1,78 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
 #define size 5
 
-int q[size], f = 0, r = -1;
-int count = 0;
+void push(int a);
+int pop();
+void display();
 
-void enqueue(int item){
-    if(count == size){
-        printf("\nQueue full!");
-        return;
+int fpos = -1, rpos = -1;
+int queue[size];
+
+int main(){
+    int choice;
+    printf("1. Enqueue\n2. Dequeue\n3. Display\n4. Exit\nEnter choice: ");
+    scanf("%d", &choice);
+    int a;
+    while(choice != 4){
+        switch(choice){
+            case 1:
+                printf("Enter integer to be pushed: ");
+                scanf("%d", &a);
+                push(a);
+                // printf("fpos = %d; rpos = %d\n", fpos%size, rpos%size);
+                break;
+            case 2:
+                a = pop();
+                printf("Popped integer = %d\n", a);
+                // printf("fpos = %d; rpos = %d\n", fpos%size, rpos%size);
+                break;
+            case 3:
+                display();
+                break;
+            default:
+                printf("Idk");
+                break;
+        }
+        printf("Enter choice: ");
+        scanf("%d", &choice);
     }
-    q[(++r)%size] = item;
-    count++;
+
 }
 
-void dequeue(){
-    if(count == 0){
-        printf("\nQueue empty!");
+void push(int a){
+    if (fpos == -1 && rpos == -1){
+        queue[++rpos] = a;
+        fpos++;
         return;
     }
-    f = (f+1)%size;
-    count--;
+    else if ((rpos+1)%size == (fpos%size)){
+        printf("Queue overflow condition\n");
+        return;
+    }
+    else{
+        rpos++;
+        queue[(rpos%size)] = a;
+        return;
+    }
+}
+
+int pop(){
+    if (fpos == -1){
+        printf("Queue Underflow condition\n");
+    }
+    int n = queue[fpos%size];
+    queue[fpos%size] = (int) NULL;
+    fpos++;
+    return n;
 }
 
 void display(){
-    if(count == 0){
-        printf("\nQueue empty!");
-        return;
-    }
-    int front = f;
-    for(int i = 0; i<count; i++){
-        printf("%d ",q[front]);
-        front = (front+1)%size;
-    }
-}
-
-int main(){
-    int ch, item;
-    while(1){
-        printf("\nSelect choice \n1.Enqueue \n2.Dequeue \n3.Display: ");
-        scanf("%d",&ch);
-
-        switch(ch){
-        case 1:
-            printf("\nEnter value to insert: ");
-            scanf("%d",&item);
-            enqueue(item);
-            break;
-        case 2:
-            dequeue();
-            printf("\nItem popped");
-            break;
-        case 3:
-            display();
-            break;
-            default:
-        exit(0);
-    }
-    }
+    printf("Queue: ");
+    for(int i = 0; i < size; i++)
+        printf("%d ", queue[i]);
+    printf("\n");
 }
